@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+
+    wordpress:
+        image: ${WP_IMAGE}
+        restart: always
+        container_name: ${WP_C_NAME}
+        networks:
+            - wp-network
+        environment:
+            WORDPRESS_DB_HOST: ${DB_HOST}
+            WORDPRESS_TABLE_PREFIX: ${WP_DB_PREFIX}
+            WORDPRESS_DB_NAME: ${DB_NAME}
+            WORDPRESS_DB_USER: ${DB_USER}
+            WORDPRESS_DB_PASSWORD: ${DB_PASS}
+        volumes:
+            - ./dist:/var/www/html
+            - ./php:/usr/local/etc/php
+        depends_on:
+            - mariadb
+
+    mariadb:
+        image: ${DB_IMAGE}
+        restart: always
+        container_name: ${DB_C_NAME}
+        networks:
+            - wp-network
+        environment:
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USER}
+            MYSQL_PASSWORD: ${DB_PASS}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+        volumes:
+            - ./data:/var/lib/mysql
+
+    nginx:
+        image: ${NGX_IMAGE}
+        restart: always
+        networks:
+            - wp-network
+        # expose:
+        #     - 8081
+        ports:
+            - "81:80"
+        volumes:
+            - ./conf:/etc/nginx/conf.d
+            - ./logs:/var/log/nginx
+            - ./dist:/var/www/html
+        depends_on:
+            - wordpress
+
+networks:
+    wp-network:

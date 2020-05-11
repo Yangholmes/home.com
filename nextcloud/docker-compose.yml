@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+    mariadb:
+        image: ${DB_IMAGE}
+        restart: always
+        container_name: ${DB_C_NAME}
+        command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+        networks:
+            - nfs-network
+        environment:
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USER}
+            MYSQL_PASSWORD: ${DB_PASS}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+        volumes:
+            - ./db:/var/lib/mysql
+
+    nextcloud:
+        image: ${NC_IMAGE}
+        restart: always
+        container_name: ${NC_C_NAME}
+        networks:
+            - nfs-network
+        ports:
+            - "82:80"
+        volumes:
+            - ./dist:/var/www/html
+            - ./custom_apps:/var/www/html/custom_apps
+            - ./config:/var/www/html/config
+            - ./data:/var/www/html/data
+        depends_on:
+            - mariadb
+
+networks:
+    nfs-network:
