@@ -1,0 +1,11 @@
+logging {
+    channel query_log { #这段是对日志文件的定义
+        file "query.log" versions 5 size 20m; #定义文件名，文件大小
+        severity info; #日志级别
+        print-time yes; #是否输出日期
+        print-category yes; #是否输出日志类型
+    };
+    category queries {
+        query_log;
+    };
+};
