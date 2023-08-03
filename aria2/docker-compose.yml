@@ -1,0 +1,23 @@
+version: '3'
+services:
+  aria2:
+    image: p3terx/aria2-pro:latest
+    container_name: aria2-pro
+    environment:
+      UMASK_SET: 022
+      RPC_SECRET: 123456
+      RPC_PORT: 6800
+      LISTEN_PORT: 6888
+    volumes:
+      - ./aria2-config:/config
+      - ./aria2-downloads:/downloads
+    ports:
+      - 6800:6800
+      - 6888:6888
+      - 6888:6888/udp
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: 1m
+    networks:
+      - default
